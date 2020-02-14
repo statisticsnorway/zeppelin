@@ -617,8 +617,8 @@ public class Note implements JsonSerializable {
    * @param paragraphId ID of paragraph
    * @return a paragraph that was deleted, or <code>null</code> otherwise
    */
-  public Paragraph removeParagraph(String user, String paragraphId) {
-    removeAllAngularObjectInParagraph(user, paragraphId);
+  public Paragraph removeParagraph(AuthenticationInfo subject, String paragraphId) {
+    removeAllAngularObjectInParagraph(subject.getUser(), paragraphId);
     interpreterSettingManager.removeResourcesBelongsToParagraph(getId(), paragraphId);
     synchronized (paragraphs) {
       Iterator<Paragraph> i = paragraphs.iterator();
@@ -627,6 +627,7 @@ public class Note implements JsonSerializable {
         if (p.getId().equals(paragraphId)) {
           i.remove();
           try {
+            p.setAuthenticationInfo(subject);
             fireParagraphRemoveEvent(p);
           } catch (IOException e) {
             e.printStackTrace();

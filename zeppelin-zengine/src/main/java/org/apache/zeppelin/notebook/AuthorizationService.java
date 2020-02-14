@@ -329,6 +329,10 @@ public class AuthorizationService implements ClusterEventListener {
     notebook.getNote(noteId).setOwners(Sets.newHashSet());
   }
 
+  public void reloadAllNotesForUser(AuthenticationInfo subject) throws IOException {
+    notebook.reloadAllNotes(subject);
+  }
+
   @Override
   public void onClusterEvent(String msg) {
     if (LOGGER.isDebugEnabled()) {

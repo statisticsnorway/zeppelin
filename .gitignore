@@ -23,9 +23,9 @@ zeppelin-server/local-repo
 zeppelin-server/src/main/resources/zeppelin-site.xml
 
 # conf file
-conf/zeppelin-env.sh
+zeppelin-interpreter/src/main/resources/zeppelin-env.sh
 conf/zeppelin-env.cmd
-conf/zeppelin-site.xml
+zeppelin-interpreter/src/main/resources/zeppelin-site.xml
 conf/shiro.ini
 conf/keystore
 conf/truststore
@@ -128,3 +128,6 @@ tramp
 
 # Git properties
 **/git.properties
+
+# Local notebook repo
+/user_notebooks/

@@ -292,7 +292,7 @@ public class NotebookServer extends WebSocketServlet
           listNotesInfo(conn, messagereceived);
           break;
         case RELOAD_NOTES_FROM_REPO:
-          broadcastReloadedNoteList(conn, getServiceContext(messagereceived));
+          reloadNoteListForUser(conn, getServiceContext(messagereceived));
           break;
         case GET_HOME_NOTE:
           getHomeNote(conn, messagereceived);
@@ -499,8 +499,8 @@ public class NotebookServer extends WebSocketServlet
         });
   }
 
-  public void broadcastUpdateNoteJobInfo(long lastUpdateUnixTime) throws IOException {
-    getJobManagerService().getNoteJobInfoByUnixTime(lastUpdateUnixTime, null,
+  public void broadcastUpdateNoteJobInfo(long lastUpdateUnixTime, AuthenticationInfo subject) throws IOException {
+    getJobManagerService().getNoteJobInfoByUnixTime(lastUpdateUnixTime, new ServiceContext(subject, new HashSet<>()),
         new WebSocketServiceCallback<List<JobManagerService.NoteJobInfo>>(null) {
           @Override
           public void onSuccess(List<JobManagerService.NoteJobInfo> notesJobInfo,
@@ -600,7 +600,7 @@ public class NotebookServer extends WebSocketServlet
     }
     //send first to requesting user
     List<NoteInfo> notesInfo = getNotebook().getNotesInfo(
-        noteId -> getNotebookAuthorizationService().isReader(noteId, userAndRoles));
+        noteId -> true); // TODO (ajtb)
     Message message = new Message(OP.NOTES_INFO).put("notes", notesInfo);
     connectionManager.multicastToUser(subject.getUser(), message);
     //to others afterwards
@@ -741,6 +741,19 @@ public class NotebookServer extends WebSocketServlet
             connectionManager.broadcastNoteListExcept(notesInfo, context.getAutheInfo());
           }
         });
+  }
+
+  public void reloadNoteListForUser(NotebookSocket conn, ServiceContext context) throws IOException {
+    getNotebookService().listNotesInfo(true, context,
+            new WebSocketServiceCallback<List<NoteInfo>>(conn) {
+              @Override
+              public void onSuccess(List<NoteInfo> notesInfo,
+                                    ServiceContext context) throws IOException {
+                super.onSuccess(notesInfo, context);
+                connectionManager.multicastToUser(context.getAutheInfo().getUser(),
+                        new Message(OP.NOTES_INFO).put("notes", notesInfo));
+              }
+            });
   }
 
   void permissionError(NotebookSocket conn, String op, String userName, Set<String> userAndRoles,
@@ -1760,7 +1773,8 @@ public class NotebookServer extends WebSocketServlet
   @Override
   public void onParagraphRemove(Paragraph p) {
     try {
-      getJobManagerService().getNoteJobInfoByUnixTime(System.currentTimeMillis() - 5000, null,
+      getJobManagerService().getNoteJobInfoByUnixTime(System.currentTimeMillis() - 5000,
+              new ServiceContext(p.getAuthenticationInfo(), new HashSet<>()),
           new JobManagerServiceCallback());
     } catch (IOException e) {
       LOG.warn("can not broadcast for job manager: " + e.getMessage(), e);
@@ -1770,7 +1784,7 @@ public class NotebookServer extends WebSocketServlet
   @Override
   public void onNoteRemove(Note note, AuthenticationInfo subject) {
     try {
-      broadcastUpdateNoteJobInfo(System.currentTimeMillis() - 5000);
+      broadcastUpdateNoteJobInfo(System.currentTimeMillis() - 5000, subject);
     } catch (IOException e) {
       LOG.warn("can not broadcast for job manager: " + e.getMessage(), e);
     }
@@ -1877,7 +1891,7 @@ public class NotebookServer extends WebSocketServlet
     p.setStatusToUserParagraph(p.getStatus());
     broadcastParagraph(p.getNote(), p);
     try {
-      broadcastUpdateNoteJobInfo(System.currentTimeMillis() - 5000);
+      broadcastUpdateNoteJobInfo(System.currentTimeMillis() - 5000, p.getAuthenticationInfo());
     } catch (IOException e) {
       LOG.error("can not broadcast for job manager {}", e);
     }

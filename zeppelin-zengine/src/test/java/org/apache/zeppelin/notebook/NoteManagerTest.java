@@ -33,15 +33,15 @@ public class NoteManagerTest {
 
     // list notes
     assertEquals(3, this.noteManager.getNotesInfo().size());
-    assertEquals(note1, this.noteManager.getNote(note1.getId()));
-    assertEquals(note2, this.noteManager.getNote(note2.getId()));
-    assertEquals(note3, this.noteManager.getNote(note3.getId()));
+    assertEquals(note1, this.noteManager.getNote(note1.getId(), AuthenticationInfo.ANONYMOUS));
+    assertEquals(note2, this.noteManager.getNote(note2.getId(), AuthenticationInfo.ANONYMOUS));
+    assertEquals(note3, this.noteManager.getNote(note3.getId(), AuthenticationInfo.ANONYMOUS));
 
     // move note
     this.noteManager.moveNote(note1.getId(), "/dev/project_1/my_note1",
         AuthenticationInfo.ANONYMOUS);
     assertEquals(3, this.noteManager.getNotesInfo().size());
-    assertEquals("/dev/project_1/my_note1", this.noteManager.getNote(note1.getId()).getPath());
+    assertEquals("/dev/project_1/my_note1", this.noteManager.getNote(note1.getId(), AuthenticationInfo.ANONYMOUS).getPath());
 
     // move folder
     this.noteManager.moveFolder("/dev", "/staging", AuthenticationInfo.ANONYMOUS);

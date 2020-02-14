@@ -57,6 +57,11 @@
 
   <dependencies>
     <dependency>
+      <groupId>no.ssb.dapla.notes</groupId>
+      <artifactId>dapla-notes-zeppelin</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>zeppelin-interpreter</artifactId>
       <version>${project.version}</version>

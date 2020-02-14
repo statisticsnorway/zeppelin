@@ -16,6 +16,7 @@
  */
 package org.apache.zeppelin.rest;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.Collection;
 import java.util.HashMap;
@@ -52,6 +53,7 @@ import org.apache.zeppelin.realm.kerberos.KerberosToken;
 import org.apache.zeppelin.server.JsonResponse;
 import org.apache.zeppelin.service.AuthenticationService;
 import org.apache.zeppelin.ticket.TicketContainer;
+import org.apache.zeppelin.user.AuthenticationInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -196,12 +198,17 @@ public class LoginRestApi {
 
       // set roles for user in NotebookAuthorization module
       authorizationService.setRoles(principal, roles);
+
+      // Load notes list for user
+      this.authorizationService.reloadAllNotesForUser(new AuthenticationInfo(principal, new Gson().toJson(roles), ticket));
     } catch (AuthenticationException uae) {
       // username wasn't in the system, show them an error message?
       // password didn't match, try again?
       // account for that username is locked - can't login.  Show them a message?
       // unexpected condition - error?
       LOG.error("Exception in login: ", uae);
+    } catch (IOException e) {
+      LOG.error("Exception when listing notes", e);
     }
     return response;
   }

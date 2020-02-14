@@ -252,7 +252,11 @@ public class Notebook {
    * @throws IOException when fail to get it from NotebookRepo.
    */
   public Note getNote(String noteId) throws IOException {
-    Note note = noteManager.getNote(noteId);
+    return getNote(noteId, AuthenticationInfo.ANONYMOUS);
+  }
+
+  public Note getNote(String noteId, AuthenticationInfo subject) throws IOException {
+    Note note = noteManager.getNote(noteId, subject);
     if (note == null) {
       return null;
     }
@@ -368,7 +372,7 @@ public class Notebook {
   public Note loadNoteFromRepo(String id, AuthenticationInfo subject) {
     Note note = null;
     try {
-      note = noteManager.getNote(id);
+      note = noteManager.getNote(id, subject);
     } catch (IOException e) {
       LOGGER.error("Fail to get note: " + id, e);
       return null;
@@ -448,7 +452,7 @@ public class Notebook {
    * @throws IOException
    */
   public void reloadAllNotes(AuthenticationInfo subject) throws IOException {
-    this.noteManager.reloadNotes();
+    this.noteManager.reloadNotesForUser(subject);
 
     if (notebookRepo instanceof NotebookRepoSync) {
       NotebookRepoSync mainRepo = (NotebookRepoSync) notebookRepo;
@@ -490,7 +494,11 @@ public class Notebook {
   }
 
   public List<Note> getAllNotes() {
-    List<Note> noteList = noteManager.getAllNotes();
+    return getAllNotes(AuthenticationInfo.ANONYMOUS);
+  }
+
+  public List<Note> getAllNotes(AuthenticationInfo subject) {
+    List<Note> noteList = noteManager.getAllNotes(subject);
     Collections.sort(noteList, Comparator.comparing(Note::getPath));
     return noteList;
   }

@@ -903,7 +903,7 @@ public class NotebookTest extends AbstractInterpreterTest implements ParagraphJo
     assertEquals(2, interpreterSettingManager.getAllResources().size());
 
     // remove a paragraph
-    note.removeParagraph(anonymous.getUser(), p1.getId());
+    note.removeParagraph(anonymous, p1.getId());
     assertEquals(1, interpreterSettingManager.getAllResources().size());
 
     // remove note
@@ -963,7 +963,7 @@ public class NotebookTest extends AbstractInterpreterTest implements ParagraphJo
     registry.add("o3", "object3", null, null);
 
     // remove notebook
-    note.removeParagraph(anonymous.getUser(), p1.getId());
+    note.removeParagraph(anonymous, p1.getId());
 
     // paragraph scope should be removed
     assertNull(registry.get("o1", note.getId(), null));
@@ -1374,7 +1374,7 @@ public class NotebookTest extends AbstractInterpreterTest implements ParagraphJo
     note1.addCloneParagraph(p1, AuthenticationInfo.ANONYMOUS);
     assertEquals(2, onParagraphCreate.get());
 
-    note1.removeParagraph(anonymous.getUser(), p1.getId());
+    note1.removeParagraph(anonymous, p1.getId());
     assertEquals(1, onParagraphRemove.get());
 
     notebook.removeNote(note1.getId(), anonymous);

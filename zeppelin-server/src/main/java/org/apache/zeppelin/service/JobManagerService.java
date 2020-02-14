@@ -66,7 +66,7 @@ public class JobManagerService {
                                                     ServiceContext context,
                                                     ServiceCallback<List<NoteJobInfo>> callback)
       throws IOException {
-    List<Note> notes = notebook.getAllNotes();
+    List<Note> notes = notebook.getAllNotes(context.getAutheInfo());
     List<NoteJobInfo> notesJobInfo = new ArrayList<>();
     for (Note note : notes) {
       NoteJobInfo noteJobInfo = new NoteJobInfo(note);

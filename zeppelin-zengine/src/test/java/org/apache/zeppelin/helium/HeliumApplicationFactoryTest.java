@@ -152,7 +152,7 @@ public class HeliumApplicationFactoryTest extends AbstractInterpreterTest {
     }
 
     // when remove paragraph
-    note1.removeParagraph("user", p1.getId());
+    note1.removeParagraph(new AuthenticationInfo("user"), p1.getId());
 
     // then
     assertEquals(ApplicationState.Status.UNLOADED, app.getStatus());

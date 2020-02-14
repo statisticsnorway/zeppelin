@@ -24,6 +24,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.zeppelin.conf.ZeppelinConfiguration;
 import org.apache.zeppelin.interpreter.InterpreterFactory;
 import org.apache.zeppelin.notebook.Note;
+import org.apache.zeppelin.notebook.NoteInfo;
 import org.apache.zeppelin.notebook.Paragraph;
 import org.apache.zeppelin.user.AuthenticationInfo;
 import org.eclipse.jgit.api.Git;
@@ -40,6 +41,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.Map;
 
 import static org.mockito.Mockito.mock;
 
@@ -128,6 +130,12 @@ public class GitHubNotebookRepoTest {
       if (!FileUtils.deleteQuietly(temporaryFolder))
         LOG.error("Failed to delete {} ", temporaryFolder.getName());
     }
+  }
+
+  @Test
+  public void testList() throws IOException {
+    Map<String, NoteInfo> user1List = gitHubNotebookRepo.list(new AuthenticationInfo("user1"));
+    System.out.println(user1List);
   }
 
   @Test

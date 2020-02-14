@@ -115,7 +115,7 @@ public class NotebookService {
   public Note getNote(String noteId,
                       ServiceContext context,
                       ServiceCallback<Note> callback) throws IOException {
-    Note note = notebook.getNote(noteId);
+    Note note = notebook.getNote(noteId, context.getAutheInfo());
     if (note == null) {
       callback.onFailure(new NoteNotFoundException(noteId), context);
       return null;
@@ -210,7 +210,7 @@ public class NotebookService {
       }
     }
     List<NoteInfo> notesInfo = notebook.getNotesInfo(
-            noteId -> authorizationService.isReader(noteId, context.getUserAndRoles()));
+            noteId -> true); // TODO(ajtb)
     callback.onSuccess(notesInfo, context);
     return notesInfo;
   }
@@ -435,7 +435,7 @@ public class NotebookService {
     if (note.getParagraph(paragraphId) == null) {
       throw new ParagraphNotFoundException(paragraphId);
     }
-    Paragraph p = note.removeParagraph(context.getAutheInfo().getUser(), paragraphId);
+    Paragraph p = note.removeParagraph(context.getAutheInfo(), paragraphId);
     notebook.saveNote(note, context.getAutheInfo());
     callback.onSuccess(p, context);
   }
@@ -885,7 +885,7 @@ public class NotebookService {
   public void moveNoteToTrash(String noteId,
                                  ServiceContext context,
                                  ServiceCallback<Note> callback) throws IOException {
-    Note note = notebook.getNote(noteId);
+    Note note = notebook.getNote(noteId, context.getAutheInfo());
     if (note == null) {
       callback.onFailure(new NoteNotFoundException(noteId), context);
       return;
